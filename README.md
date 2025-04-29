@@ -1,6 +1,6 @@
-# ECS Terraform Module
+# Node.js Application with ECS Terraform Infrastructure
 
-This repository contains a modular Terraform implementation for deploying an ECS cluster with best practices.
+This repository contains a Node.js application with a CI/CD pipeline for deployment to AWS ECS using Terraform infrastructure.
 
 ## Architecture
 
@@ -24,26 +24,78 @@ The implementation follows these best practices:
    - Security groups with least privilege
    - IAM roles with appropriate permissions
 
+4. **CI/CD Pipeline**:
+   - GitHub Actions workflow for automated builds, tests, and deployments
+   - Multi-environment support (dev, staging, prod)
+   - Docker container building and publishing to ECR
+   - Automated ECS deployment
+
 ## Directory Structure
 
 ```
 .
-├── main.tf              # Main configuration file
-├── variables.tf         # Input variables
-├── outputs.tf           # Output values
-├── provider.tf          # Provider configuration
-└── modules/
-    ├── vpc/             # VPC module
+├── .github/
+│   └── workflows/
+│       └── nodejs-cicd.yml    # CI/CD pipeline configuration
+├── src/                       # Node.js application source code
+│   ├── index.js               # Main application file
+│   └── __tests__/             # Test files
+│       └── index.test.js      # Test for index.js
+├── main.tf                    # Main Terraform configuration file
+├── variables.tf               # Terraform input variables
+├── outputs.tf                 # Terraform output values
+├── provider.tf                # Terraform provider configuration
+├── pipeline.tf                # Terraform pipeline configuration
+├── Dockerfile                 # Docker configuration for the application
+├── package.json               # Node.js package configuration
+└── modules/                   # Terraform modules
+    ├── vpc/                   # VPC module
     │   ├── main.tf
     │   ├── variables.tf
     │   └── outputs.tf
-    └── ecs/             # ECS module
+    └── ecs/                   # ECS module
         ├── main.tf
         ├── variables.tf
         └── outputs.tf
 ```
 
 ## Usage
+
+### Local Development
+
+1. Install dependencies:
+   ```
+   npm install
+   ```
+
+2. Run the application in development mode:
+   ```
+   npm run dev
+   ```
+
+3. Run tests:
+   ```
+   npm test
+   ```
+
+4. Build the application:
+   ```
+   npm run build
+   ```
+
+### Docker
+
+1. Build the Docker image:
+   ```
+   docker build -t nodejs-app .
+   ```
+
+2. Run the Docker container:
+   ```
+   docker run -p 3000:3000 nodejs-app
+   ```
+
+### Infrastructure Deployment
 
 1. Initialize Terraform:
    ```
@@ -64,6 +116,32 @@ The implementation follows these best practices:
    ```
    terraform destroy
    ```
+
+### CI/CD Pipeline
+
+The CI/CD pipeline is configured using GitHub Actions and is defined in `.github/workflows/nodejs-cicd.yml`. The pipeline will automatically:
+
+1. Build and test the Node.js application
+2. Build and push a Docker image to Amazon ECR
+3. Deploy the application to Amazon ECS
+
+#### Required Secrets
+
+Add the following secrets to your GitHub repository:
+
+- `AWS_ACCESS_KEY_ID`: AWS access key with permissions to ECR and ECS
+- `AWS_SECRET_ACCESS_KEY`: AWS secret key
+
+#### Environment Variables
+
+The following environment variables can be configured in GitHub repository variables:
+
+- `AWS_REGION`: AWS region (default: us-west-2)
+- `ECR_REPOSITORY`: ECR repository name
+- `ECS_CLUSTER`: ECS cluster name
+- `ECS_SERVICE`: ECS service name
+- `ECS_TASK_DEFINITION`: ECS task definition name
+- `CONTAINER_NAME`: Container name in the task definition
 
 ## Remote State Configuration
 
